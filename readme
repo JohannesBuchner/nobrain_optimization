@@ -1,0 +1,62 @@
+This algorithm allows you to solve any minimum/maximum finding problem within a n-dimensional box.
+It is meant for functions that are costly to evaluate (hours).
+
+Algorithm description:
+
+You are in a valley and want to go atop a mountain. However, you are blind. But you have a height detector.
+The detector needs some time to take the measurement, and you can not measure while walking.
+
+So what you do is:
+Setup: n ... number of dimensions you are in. i=0, scale = 0.5 the size of your world.
+ 0 take a measure where you are.
+ 1 go in direction $x[i] for $scale long
+ 2 take a measure
+  3 if it is better than where you were, stay here
+    otherwise, go back
+    4 if you turned back twice in every direction, it is time to refine:
+      set scale = scale * zoom_in_factor, with zoom_in_factor being 0.5 or 0.1
+ 5 i = i mod n
+ repeat 1
+
+This algorithm always finds the local maximum. It performs good if your expectations are low :-)
+However, it performs very bad compared at Rosenbrocks valley compared to "real" optimization 
+algorithms like CONDOR.
+
+It is especially useful if you have a n-dimensional slope with one maximum. 
+
+Example:
+
+We want to determine the optimal starting_scale and zoom_in_factor for the algorithm:
+
+ $ mkfifo /tmp/in; mkfifo /tmp/out
+in one terminal we provide our testing object (a polynomial):
+ $ cat /tmp/out | while read ZOOM_IN_FACTOR START_SCALE; do 
+     rm example_climber.exe
+     CCFLAGS="-DZOOM_IN_FACTOR=$ZOOM_IN_FACTOR -DSTART_SCALE=$START_SCALE" make example_climber.exe 1>&2 && 
+     	./example_climber.exe 1e-6 |tail -n1|sed 's/ steps//g'|sed 's/^/-/g'
+	# the line above removes the text " steps" and turns the value in a maximization problem (least steps)
+   done | tee -a /tmp/in
+on another terminal we run the algorithm to find the best values in this 2-dimensional maximization problem:
+ $ ./generic_climber.exe 0.001 d 0.01 0.99 0.17 d 0.1 2.0 1.0 < /tmp/in |tee -a /tmp/out
+
+What do these parameters mean?
+Usage output of generic_climber.exe:
+---
+./generic_climber.exe: SYNOPSIS: <exactness> parameters...
+
+	exactness: 	how detailled should we refine the search
+	parameters:	each parameter is a quadrupel of type, min, max, start
+		type: i for integer, d for double
+		min : lower bound of parameter values
+		max : upperbound of parameter values
+		start : starting point (0..1)
+
+example: ./generic_climber.exe 0.001 i -10 100 0 d 12.3 54 20
+---
+
+Turns out, in bad scenarios (Rosenbrocks valley), best is starting_scale=1.1 and zoom_in_factor=0.5.
+In a general polynomial that is not very steep, we don't have to be that cautious: zoom_in_factor=0.1.
+
+Have fun,
+Johannes Buchner
+
