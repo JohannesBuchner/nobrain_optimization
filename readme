@@ -57,6 +57,14 @@ example: ./generic_climber.exe 0.001 i -10 100 0 d 12.3 54 20
 Turns out, in bad scenarios (Rosenbrocks valley), best is starting_scale=1.1 and zoom_in_factor=0.5.
 In a general polynomial that is not very steep, we don't have to be that cautious: zoom_in_factor=0.1.
 
+You can find more details on how to adapt to your programs at 
+http://wiki.github.com/JohannesBuchner/condor_optimization/usage
+This page discribes the usage with the CONDOR algorithm, however the
+interface is the same as generic_climber.exe.
+
+You can use any tool or programming language to plug in.
+
+
 Have fun,
 Johannes Buchner
 
