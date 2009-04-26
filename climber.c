@@ -307,7 +307,7 @@ int find_local_maximum_naive(unsigned int ndim, double exactness,
 				gsl_vector_set(scales, i, gsl_vector_get(scales, i) * -1);
 			}
 		}
-#ifdef ROUNDROBIN
+#ifndef NO_ROUNDROBIN
 		last_i = i;
 #else
 		last_i = 0;
@@ -354,7 +354,7 @@ int find_local_maximum_naive(unsigned int ndim, double exactness,
 int find_local_maximum(unsigned int ndim, double exactness, gsl_vector * start) {
 	assert(ndim > 1);
 	assert(exactness > 0 && exactness < 1);
-#ifdef NAIVE
+#ifndef NOT_NAIVE
 	return find_local_maximum_naive(ndim, exactness, start);
 #else
 	return find_local_maximum_multi(ndim, exactness, start);
